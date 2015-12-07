@@ -4,22 +4,23 @@
  */
 package eu.telecomnancy;
 
+import java.rmi.RemoteException;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
+import java.rmi.Remote;
 /**
  *
  * @author charoy
  */
-public class Client {
+public class Client implements SensorListener {
     ISensor sense;
     Scanner c=new Scanner(System.in);
-    public Client(ISensor sensor) {
+    public Client(ISensorObservable sensor) {
         sense=sensor;
     }
     
-    public void menu() {
+    public void menu() throws RemoteException{
         String rep="";
         while (!"q".equals(rep)) {
             try {
@@ -39,29 +40,16 @@ public class Client {
                     }
                     default : System.out.println("q: quitter - o: switch - s: status - v: value");
                 }
-            } catch (SensorNotActivated ex) {
+            } catch (SensorNotActivated | RemoteException ex) {
                 Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }
+
+	@Override
+	public void statusChanged(double value, boolean status) {
+		System.out.println("value :"+ value);
+		System.out.println("status :"+ status);
+	}
     
-//   Code pour JDK 1.6
-//
-//       public void menu6() {
-//        String rep="";
-//        while (!"q".equals(rep)) {
-//            try {
-//                rep= c.nextLine();
-//                if ("o".equals(rep))
-//                        sense.onOff();
-//                else if ("s".equals(rep))
-//                        System.out.println("status :"+sense.getStatus());
-//                else if ("v".equals(rep))
-//                        System.out.println("value :"+sense.getValue());
-//                else System.out.println("q: quitter - o: switch - s: status - v: value");
-//            } catch (SensorNotActivated ex) {
-//                Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
-//            }
-//        }
-//    }
 }

@@ -4,10 +4,13 @@
  */
 package eu.telecomnancy;
 
+import java.rmi.Remote;
+import java.rmi.RemoteException;
+
 /**
  *
  * @author charoy
  */
-public interface SensorListener {
-    public void statusChanged();
+public interface SensorListener extends Remote {
+	public void statusChanged(double value,boolean status) throws RemoteException;
 }

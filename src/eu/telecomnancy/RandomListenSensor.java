@@ -4,6 +4,7 @@
  */
 package eu.telecomnancy;
 
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -11,18 +12,26 @@ import java.util.Random;
  *
  * @author charoy
  */
-public class RandomListenSensor implements ISensor {
+public class RandomListenSensor implements ISensorObservable {
 
     private boolean status = false; //false = off - true = on
     double start = 50;
+    double currentValue;
     double end = 100;
     private ArrayList<SensorListener> listeners;
 
+    public RandomListenSensor(){
+    	listeners = new ArrayList<SensorListener>();
+    }
+    
     @Override
     public double getValue() throws SensorNotActivated {
+    	System.out.println("PASSSE");
         if (status) {
             double random = new Random().nextDouble();
-            return start + (random * (end - start));
+            currentValue = start + (random * (end - start));
+            notifyListeners();
+            return currentValue;
         } else {
             throw new SensorNotActivated("random Sensor not activated");
         }
@@ -30,7 +39,9 @@ public class RandomListenSensor implements ISensor {
 
     @Override
     public void onOff() {
+    	System.out.println("passe stats");
         status = !status;
+        notifyListeners();
     }
 
     @Override
@@ -47,8 +58,15 @@ public class RandomListenSensor implements ISensor {
     }
     
     public void notifyListeners() {
+    	System.out.println("PASSSE");
         for (SensorListener sensorListener : listeners) {
-            sensorListener.statusChanged();
+        	System.out.println("PASSSEboucle");
+            try {
+				sensorListener.statusChanged(this.currentValue,this.status);
+			} catch (RemoteException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
         }
     }
 }
